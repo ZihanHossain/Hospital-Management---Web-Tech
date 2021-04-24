@@ -5,6 +5,7 @@ if ($_SESSION['user'] == '') {
     header("Location: login.php");
 }
 
+$status = 'new';
 require_once 'controller/appointmentHandler.php';
 
 ?>
@@ -65,30 +66,65 @@ require_once 'controller/appointmentHandler.php';
                     </div>
                     <div class="tbl-content">
                         <table cellpadding="0" cellspacing="0" border="0">
-                            <tbody>
+                            <tbody id="new">
                                 <?php $index = 1;
-                                foreach ($patients as $i => $patient) : ?>
-                                        <tr>
-                                            <td><?php echo $index;
-                                                $index++; ?></td>
-                                            <td><a href="viewPatientProfile.php"><?php echo $patient['p_name'] ?></a></td>
-                                            <td>
-                                                <?php
-                                                $diff = date_diff(date_create($patient['dateofbirth']), date_create(date("Y-m-d"))); //Getting age from date of birth.
-                                                echo $diff->format('%y');
-                                                ?>
-                                            </td>
-                                            <td><?php echo $patient['gender'] ?></td>
-                                            <td><a href="doctorPortal.php?p_id=<?php echo $patient['p_id'] ?>"><i class="fas fa-check"></i></a></td>
-                                        </tr>
+                                foreach ($newpatients as $i => $patient) : ?>
+                                    <tr>
+                                        <td><?php echo $index;
+                                            $index++; ?></td>
+                                        <td><a href="viewPatientProfile.php?p_id=<?php echo $patient['p_id'] ?>"><?php echo $patient['p_name'] ?></a></td>
+                                        <td>
+                                            <?php
+                                            $diff = date_diff(date_create($patient['dateofbirth']), date_create(date("Y-m-d"))); //Getting age from date of birth.
+                                            echo $diff->format('%y');
+                                            ?>
+                                        </td>
+                                        <td><?php echo $patient['gender'] ?></td>
+                                        <td><a href="doctorPortal.php?p_id=<?php echo $patient['p_id'] ?>"><i class="fas fa-check"></i></a></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                            <tbody id="old" style="display: none;">
+                                <?php $index = 1;
+                                foreach ($oldpatients as $i => $patient) : ?>
+                                    <tr>
+                                        <td><?php echo $index;
+                                            $index++; ?></td>
+                                        <td><a href="viewPatientProfile.php?p_id=<?php echo $patient['p_id'] ?>"><?php echo $patient['p_name'] ?></a></td>
+                                        <td>
+                                            <?php
+                                            $diff = date_diff(date_create($patient['dateofbirth']), date_create(date("Y-m-d"))); //Getting age from date of birth.
+                                            echo $diff->format('%y');
+                                            ?>
+                                        </td>
+                                        <td><?php echo $patient['gender'] ?></td>
+                                        <td> </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
+                    <span id="aa"></span>
+                    <button type="button" class="btn btn-info" id="appoinment" onclick="triggerAppoinments()">Old</button>
                 </section>
             </div>
         </div>
     </div>
 </body>
+<script>
+    function triggerAppoinments() {
+        var newappoinment = document.getElementById("new");
+        var oldappoinment = document.getElementById("old");
+        if (newappoinment.style.display === "none") {
+            document.getElementById('appoinment').innerHTML = "Old";
+            newappoinment.style.display = "table-row-group";
+            oldappoinment.style.display = "none";
+        } else {
+            document.getElementById('appoinment').innerHTML = "New";
+            newappoinment.style.display = "none";
+            oldappoinment.style.display = "table-row-group";
+        }
+    }
+</script>
 
 </html>

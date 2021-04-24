@@ -5,6 +5,8 @@ if ($_SESSION['user'] == '') {
     header("Location: login.php");
 }
 
+require_once 'controller/patientProfile.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -48,38 +50,65 @@ if ($_SESSION['user'] == '') {
             <div class="col-9 patientInfo">
                 <div class="row">
                     <div class="col-4 list-group">
-                        <div class="row list-group-item">
-                            <div class="col-6">
+                        <div class="row">
+                            <div class="col-6 list-group-item">
                                 <span>Name: </span>
                             </div>
-                            <div class="col-6">
-
+                            <div class="col-6 list-group-item">
+                                <span><?php if (isset($patient['p_name'])) {
+                                            echo $patient['p_name'];
+                                        } ?></span>
                             </div>
                         </div>
-                        <div class="row list-group-item">
-                            <div class="col-6">
+                        <div class="row">
+                            <div class="col-6 list-group-item">
                                 <span>Age: </span>
                             </div>
-                            <div class="col-6">
-
+                            <div class="col-6 list-group-item">
+                                <span><?php
+                                        $diff = date_diff(date_create($patient['dateofbirth']), date_create(date("Y-m-d"))); //Getting age from date of birth.
+                                        echo $diff->format('%y');
+                                        ?></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 list-group-item">
+                                <label for="prescription">Prior Prescription: </label>
+                            </div>
+                            <div class="col-6 list-group-item">
+                                <select name="prescription" id="cars">
+                                    <option value="volvo">Volvo</option>
+                                    <option value="saab">Saab</option>
+                                    <option value="opel">Opel</option>
+                                    <option value="audi">Audi</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                     <div class="col-4 list-group">
-                        <div class="row list-group-item">
-                            <div class="col-6">
+                        <div class="row">
+                            <div class="col-6 list-group-item">
                                 <span>Gender: </span>
                             </div>
-                            <div class="col-6">
-
+                            <div class="col-6 list-group-item">
+                                <span><?php if (isset($patient['p_name'])) {
+                                            echo $patient['gender'];
+                                        } ?></span>
                             </div>
                         </div>
-                        <div class="row list-group-item">
-                            <div class="col-6">
+                        <div class="row">
+                            <div class="col-6 list-group-item">
                                 <span>Date Of Birth: </span>
                             </div>
-                            <div class="col-6">
-
+                            <div class="col-6 list-group-item">
+                                <span><?php if (isset($patient['p_name'])) {
+                                            echo $patient['dateofbirth'];
+                                        } ?></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="list-group-item">
+                                <button>Create A Prescription</button>
                             </div>
                         </div>
                     </div>

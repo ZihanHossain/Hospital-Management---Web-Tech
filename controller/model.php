@@ -28,7 +28,7 @@ function addDoctor($data)
 function checkDoctorUser($username)
 {
     $conn = db_conn();
-    $selectQuery = "SELECT u_name FROM `doctor` WHERE u_name LIKE '%$username%'";
+    $selectQuery = "SELECT u_name FROM `doctor` WHERE u_name = '$username'";
 
 
     try {
@@ -37,7 +37,29 @@ function checkDoctorUser($username)
         echo $e->getMessage();
     }
     $rows = $stmt->fetch();
-    if($rows == null)
+    if(empty($rows))
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+function checkDoctorEmail($email)
+{
+    $conn = db_conn();
+    $selectQuery = "SELECT email FROM `doctor` WHERE email = '$email'";
+
+
+    try {
+        $stmt = $conn->query($selectQuery);
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    $rows = $stmt->fetch();
+    if(empty($rows))
     {
         return false;
     }
@@ -66,6 +88,21 @@ function viewProfile($user_name)
 {
     $conn = db_conn();
     $selectQuery = "SELECT full_name, email, gender, dateofbirth FROM `doctor` WHERE u_name LIKE '%$user_name%'";
+
+
+    try {
+        $stmt = $conn->query($selectQuery);
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    $rows = $stmt->fetch();
+    return $rows;
+}
+
+function viewPatientProfile($p_id)
+{
+    $conn = db_conn();
+    $selectQuery = "SELECT p_name, gender, dateofbirth FROM `patient` WHERE p_id LIKE '%$p_id%'";
 
 
     try {
@@ -165,10 +202,38 @@ function showNewAppointments($d_id)
     return $dataArray;
 }
 
+function showOldAppointments($d_id)
+{
+    $conn = db_conn();
+    $selectQuery = "SELECT p_id FROM `old appointment` WHERE d_id LIKE '%$d_id%'"; //Getting patiend id by the appointed doctor's id.
+    try {
+        $stmt = $conn->query($selectQuery);
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+    $p_ids = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $dataArray = array(); //Cerating an array to hold all the new appointed patients information.
+    foreach ($p_ids as $i => $p_id) {
+        $pp_id = $p_id['p_id']; //pp_id holds patient id.
+        $selectQuery = "SELECT p_id, p_name, gender, dateofbirth FROM `patient` WHERE p_id LIKE '%$pp_id%'";
+
+
+        try {
+            $stmt = $conn->query($selectQuery);
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        $rows = $stmt->fetch();
+        array_push($dataArray, $rows);
+    }
+    return $dataArray;
+}
+
 function patientDonePHP($p_id)
 {
     $conn = db_conn();
-    $selectQuery = "SELECT a_id, p_id, d_id, d_name, room_num FROM `new appointment` WHERE p_id LIKE '%$p_id%'";
+    $selectQuery = "SELECT a_id, p_id, d_id, room_num FROM `new appointment` WHERE p_id LIKE '%$p_id%'";
 
     try {
         $stmt = $conn->query($selectQuery);
@@ -179,8 +244,8 @@ function patientDonePHP($p_id)
 
 
     if ($patient != null) {
-        $selectQuery = "INSERT into `old appointment` (a_id, p_id, d_id, d_name, room_num) 
-    VALUES (:a_id, :p_id, :d_id, :d_name, :room_num)";
+        $selectQuery = "INSERT into `old appointment` (a_id, p_id, d_id, room_num) 
+    VALUES (:a_id, :p_id, :d_id, :room_num)";
 
         try {
             $stmt = $conn->prepare($selectQuery);
@@ -188,7 +253,6 @@ function patientDonePHP($p_id)
                 ':a_id' => $patient['a_id'],
                 ':p_id' => $patient['p_id'],
                 ':d_id' => $patient['d_id'],
-                ':d_name' => $patient['d_name'],
                 ':room_num' => $patient['room_num']
             ]);
         } catch (PDOException $e) {
